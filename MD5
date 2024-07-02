@@ -1,0 +1,14 @@
+1aca9054b931842c8636b727692e1fc9 *DESCRIPTION
+d5ec0d4cbc20ea393194ce7f08f90d0c *LICENSE
+37f6eab8bad97f09c8c0175c9e17d745 *NAMESPACE
+ffaae34f233ce30581f12eb95d41beb1 *NEWS.md
+c74d23177b3b4b904e46163b1edf0e8c *R/data.R
+bad96c43ae119f2a7c5dd31e1ee2cac4 *R/sysdata.rda
+918269012d112eddbc8560b59605c6ad *R/uncertainUCDP-package.R
+01f70e4e9f62c7068a9427da70d0c7d4 *R/uncertainUCDP.R
+01a90123cf299e6052b140bdcdf027cc *data/ucdpged.rda
+615a11644bfbc4969cdb4d7a60db9538 *man/mean_uncertainUCDP.Rd
+0df61c2e6dc5d01ae09fe83d1b285aeb *man/runcertainUCDP.Rd
+40a63fd6b07d500cc9afdd0e2d30f5ee *man/ucdpged.Rd
+b0f9b8aae1046fcf3d6ac9e1247cf514 *man/uncertainUCDP-package.Rd
+446eb6bcb7145609d1e6e95391e0e8cb *man/uncertainUCDP_parameters.Rd
