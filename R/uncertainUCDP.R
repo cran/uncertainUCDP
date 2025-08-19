@@ -173,7 +173,7 @@ puncertainUCDP <- function(q, fatalities, tov = c('sb','ns','os','any')){
 
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
-	return(mistr::pgumbel(q, params$loc, params$scale) * (1-params$w) + q>=fatalities * params$w)
+	return((mistr::pgumbel(q, params$loc, params$scale) * (1-params$w)) + (as.numeric(q>=fatalities) * params$w))
 
 }
 
@@ -194,7 +194,14 @@ quncertainUCDP <- function(p, fatalities, tov = c('sb','ns','os','any')){
 
 	infliction_point <- mistr::pgumbel(fatalities, params$loc, params$scale) * (1-params$w)
 
-	return(mistr::qgumbel(p, params$loc, params$scale) * (1-params$w) + (p>=infliction_point) * params$w)
+	if(p < infliction_point){
+		return(mistr::qgumbel(p/(1-params$w), params$loc, params$scale))
+
+	}else if(p <= params$w+infliction_point){
+		return(fatalities)
+	}else if(p > params$w + infliction_point){
+		return(mistr::qgumbel((p-params$w)/(1-params$w), params$loc, params$scale))
+	}
 
 }
 
