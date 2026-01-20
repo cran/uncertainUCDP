@@ -2,19 +2,19 @@ Package: uncertainUCDP
 Type: Package
 Title: Parametric Mixture Models for Uncertainty Estimation of
         Fatalities in UCDP Conflict Data
-Version: 0.6.1
+Version: 0.7.0
 Description: Provides functions for estimating uncertainty in the number of fatalities in the Uppsala Conflict Data Program (UCDP) data. The package implements a parametric reported-value Gumbel mixture distribution that accounts for the uncertainty in the number of fatalities in the UCDP data. The model is based on information from a survey on UCDP coders and how they view the uncertainty of the number of fatalities from UCDP events. The package provides functions for making random draws of fatalities from the mixture distribution, as well as to estimate percentiles, quantiles, means, and other statistics of the distribution. Full details on the survey and estimation procedure can be found in Vesco et al (2024).
-License: MIT + file LICENSE
+License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Authors@R: 
     person("David", "Randahl", , "david.randahl@pcr.uu.se", role = c("cre", "aut"))
-Imports: dplyr, mistr, rlang, tibble
+Imports: dplyr, mistr, lmtest, sandwich, foreach, rlang, tibble
 Depends: R (>= 2.10)
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2025-08-19 15:48:17 UTC; david
+Packaged: 2026-01-20 11:23:57 UTC; david
 Author: David Randahl [cre, aut]
 Maintainer: David Randahl <david.randahl@pcr.uu.se>
 Repository: CRAN
-Date/Publication: 2025-08-19 16:20:02 UTC
+Date/Publication: 2026-01-20 11:40:02 UTC

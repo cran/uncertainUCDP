@@ -1,5 +1,3 @@
-
-
 #' Parameter extraction for uncertainUCDP-functions
 #'
 #' @description
@@ -18,84 +16,71 @@
 #' @export
 #'
 #'
-uncertainUCDP_parameters <- function(fatalities, tov){
-
-	if(is.numeric(tov)){
-		tov <- switch(tov,
-					  '1' = 'sb',
-					  '2' = 'ns',
-					  '3' = 'os',
-					  '4' = 'any')
+uncertainUCDP_parameters <- function(fatalities, tov) {
+	if (is.numeric(tov)) {
+		tov <- switch(tov, '1' = 'sb', '2' = 'ns', '3' = 'os', '4' = 'any')
 	}
-	tov <- match.arg(tov, c('sb','ns','os','any'))
+	tov <- match.arg(tov, c('sb', 'ns', 'os', 'any'))
 
-	if(!(tov %in% c('sb','ns','os','any'))){
+	if (!(tov %in% c('sb', 'ns', 'os', 'any'))) {
 		stop('tov must be one of "sb", "ns", "os", or "any"')
 	}
 
-	if(tov == 'any'){
-		warning("tov = 'any' is somewhat experimental as it combines all types of violence into a single category. Use with caution")
+	if (tov == 'any') {
+		warning(
+			"tov = 'any' is somewhat experimental as it combines all types of violence into a single category. Use with caution"
+		)
 	}
 
-	if(any(fatalities < 0)){
-		warning('fatalities must be non-negative integers, replacing negative values with NA')
+	if (any(fatalities < 0)) {
+		warning(
+			'fatalities must be non-negative integers, replacing negative values with NA'
+		)
 		fatalities[fatalities < 0] <- NA
 	}
 
-	if(any(fatalities != round(fatalities))){
-		warning('fatalities should be an interger. Using non-integers may lead to unexpected results and should be considered experimental')
+	if (any(fatalities != round(fatalities))) {
+		warning(
+			'fatalities should be an interger. Using non-integers may lead to unexpected results and should be considered experimental'
+		)
 	}
 
-	data <- tibble::tibble(fatlev = fatalities,
-								 logfatlev = base::log1p(.data$fatlev),
-								 fl_1 = dplyr::case_when(.data$fatlev == 1 ~ 1,
-								 								 T~0),
-								 fl_2 = dplyr::case_when(.data$fatlev == 2 ~ 1,
-								 								 T~0),
-								 fl_3 = dplyr::case_when(.data$fatlev == 3 ~ 1,
-								 								 T~0),
-								 fl_13 = dplyr::case_when(.data$fatlev == 13 ~ 1,
-								 									T~0),
-								 fl_20 = dplyr::case_when(.data$fatlev == 20 ~ 1,
-								 									T~0),
-								 fl_24 = dplyr::case_when(.data$fatlev == 24 ~ 1,
-								 									T~0),
-								 fl_40 = dplyr::case_when(.data$fatlev == 40 ~ 1,
-								 									T~0),
-								 fl_101 = dplyr::case_when(.data$fatlev == 101 ~ 1,
-								 									 T~0),
-								 fl_200 = dplyr::case_when(.data$fatlev == 200 ~ 1,
-								 									 T~0),
-								 fl_1001 = dplyr::case_when(.data$fatlev == 1001 ~ 1,
-								 										T~0),
-								 fl_2000 = dplyr::case_when(.data$fatlev == 2000 ~ 1,
-								 										T~0))
+	data <- tibble::tibble(
+		fatlev = fatalities,
+		logfatlev = base::log1p(.data$fatlev),
+		fl_1 = dplyr::case_when(.data$fatlev == 1 ~ 1, T ~ 0),
+		fl_2 = dplyr::case_when(.data$fatlev == 2 ~ 1, T ~ 0),
+		fl_3 = dplyr::case_when(.data$fatlev == 3 ~ 1, T ~ 0),
+		fl_13 = dplyr::case_when(.data$fatlev == 13 ~ 1, T ~ 0),
+		fl_20 = dplyr::case_when(.data$fatlev == 20 ~ 1, T ~ 0),
+		fl_24 = dplyr::case_when(.data$fatlev == 24 ~ 1, T ~ 0),
+		fl_40 = dplyr::case_when(.data$fatlev == 40 ~ 1, T ~ 0),
+		fl_101 = dplyr::case_when(.data$fatlev == 101 ~ 1, T ~ 0),
+		fl_200 = dplyr::case_when(.data$fatlev == 200 ~ 1, T ~ 0),
+		fl_1001 = dplyr::case_when(.data$fatlev == 1001 ~ 1, T ~ 0),
+		fl_2000 = dplyr::case_when(.data$fatlev == 2000 ~ 1, T ~ 0)
+	)
 
-
-	if(tov == 'sb'){
-	loc <- expm1(stats::predict(internal_models$sb[[1]], newdata = data))
-	scale <- exp(stats::predict(internal_models$sb[[2]], newdata = data))
-	w <- stats::predict(internal_models$sb[[3]], newdata = data, type = 'r')
-	}else if(tov == 'ns'){
-	loc <- expm1(stats::predict(internal_models$ns[[1]], newdata = data))
-	scale <- exp(stats::predict(internal_models$ns[[2]], newdata = data))
-	w <- stats::predict(internal_models$ns[[3]], newdata = data, type = 'r')
-	}else if(tov == 'os'){
-	loc <- expm1(stats::predict(internal_models$os[[1]], newdata = data))
-	scale <- exp(stats::predict(internal_models$os[[2]], newdata = data))
-	w <- stats::predict(internal_models$os[[3]], newdata = data, type = 'r')
-	}else if(tov == 'any'){
-	loc <- expm1(stats::predict(internal_models$any[[1]], newdata = data))
-	scale <- exp(stats::predict(internal_models$any[[2]], newdata = data))
-	w <- stats::predict(internal_models$any[[3]], newdata = data, type = 'r')
+	if (tov == 'sb') {
+		loc <- expm1(stats::predict(internal_models$sb[[1]], newdata = data))
+		scale <- exp(stats::predict(internal_models$sb[[2]], newdata = data))
+		w <- stats::predict(internal_models$sb[[3]], newdata = data, type = 'r')
+	} else if (tov == 'ns') {
+		loc <- expm1(stats::predict(internal_models$ns[[1]], newdata = data))
+		scale <- exp(stats::predict(internal_models$ns[[2]], newdata = data))
+		w <- stats::predict(internal_models$ns[[3]], newdata = data, type = 'r')
+	} else if (tov == 'os') {
+		loc <- expm1(stats::predict(internal_models$os[[1]], newdata = data))
+		scale <- exp(stats::predict(internal_models$os[[2]], newdata = data))
+		w <- stats::predict(internal_models$os[[3]], newdata = data, type = 'r')
+	} else if (tov == 'any') {
+		loc <- expm1(stats::predict(internal_models$any[[1]], newdata = data))
+		scale <- exp(stats::predict(internal_models$any[[2]], newdata = data))
+		w <- stats::predict(internal_models$any[[3]], newdata = data, type = 'r')
 	}
 
 	return(list(loc = loc, scale = scale, w = w))
-
-
 }
-
-
 
 
 #' Parametric uncertainty distributions for UCDP events
@@ -153,9 +138,8 @@ uncertainUCDP_parameters <- function(fatalities, tov){
 #' # Obtaining the density for the first event in the GED sample
 #' duncertainUCDP(x = seq(0, 50), fatalities = ucdpged$best[1], tov = ucdpged$type_of_violence[1])
 #'
-runcertainUCDP <- function(n, fatalities, tov = c('sb','ns','os','any')){
-
-	if(length(n) != 1){
+runcertainUCDP <- function(n, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
+	if (length(n) != 1) {
 		stop('n must be a single integer')
 	}
 
@@ -164,45 +148,52 @@ runcertainUCDP <- function(n, fatalities, tov = c('sb','ns','os','any')){
 	gumbels <- rgumbel(n, params$loc, params$scale)
 	rv_inflation <- stats::rbinom(n, 1, params$w)
 
-	return(gumbels * (1-rv_inflation) + fatalities * rv_inflation)
+	return(gumbels * (1 - rv_inflation) + fatalities * rv_inflation)
 }
 
 #' @rdname runcertainUCDP
 #' @export
-puncertainUCDP <- function(q, fatalities, tov = c('sb','ns','os','any')){
-
+puncertainUCDP <- function(q, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
-	return((mistr::pgumbel(q, params$loc, params$scale) * (1-params$w)) + (as.numeric(q>=fatalities) * params$w))
-
+	return(
+		(mistr::pgumbel(q, params$loc, params$scale) * (1 - params$w)) +
+			(as.numeric(q >= fatalities) * params$w)
+	)
 }
 
 #' @rdname runcertainUCDP
 #' @export
-duncertainUCDP <- function(x, fatalities, tov = c('sb','ns','os','any')){
-
+duncertainUCDP <- function(x, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
+	inflate <- as.numeric(x == fatalities)
 
-	return(mistr::dgumbel(x, params$loc, params$scale) * (1-params$w) + x==fatalities * params$w)
+	return(
+		mistr::dgumbel(x, params$loc, params$scale) *
+			(1 - params$w) +
+			inflate * params$w
+	)
 }
 
 #' @rdname runcertainUCDP
 #' @export
-quncertainUCDP <- function(p, fatalities, tov = c('sb','ns','os','any')){
-
+quncertainUCDP <- function(p, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
-	infliction_point <- mistr::pgumbel(fatalities, params$loc, params$scale) * (1-params$w)
+	infliction_point <- mistr::pgumbel(fatalities, params$loc, params$scale) *
+		(1 - params$w)
 
-	if(p < infliction_point){
-		return(mistr::qgumbel(p/(1-params$w), params$loc, params$scale))
-
-	}else if(p <= params$w+infliction_point){
+	if (p < infliction_point) {
+		return(mistr::qgumbel(p / (1 - params$w), params$loc, params$scale))
+	} else if (p <= params$w + infliction_point) {
 		return(fatalities)
-	}else if(p > params$w + infliction_point){
-		return(mistr::qgumbel((p-params$w)/(1-params$w), params$loc, params$scale))
+	} else if (p > params$w + infliction_point) {
+		return(mistr::qgumbel(
+			(p - params$w) / (1 - params$w),
+			params$loc,
+			params$scale
+		))
 	}
-
 }
 
 
@@ -247,17 +238,19 @@ quncertainUCDP <- function(p, fatalities, tov = c('sb','ns','os','any')){
 #' # Calculate the 90th percentile for the first event in the UCDP GED sample
 #' quantiles_unceartainUCDP(ucdpged$best[1], 0.9, tov = ucdpged$type_of_violence[1])
 #'
-mean_uncertainUCDP <- function(fatalities, tov = c('sb','ns','os','any')){
-
+mean_uncertainUCDP <- function(fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
-	return((params$loc + params$scale * -digamma(1))*(1-params$w) + fatalities * params$w)
+	return(
+		(params$loc + params$scale * -digamma(1)) *
+			(1 - params$w) +
+			fatalities * params$w
+	)
 }
 
 #' @rdname mean_uncertainUCDP
 #' @export
-median_uncertainUCDP <- function(fatalities, tov = c('sb','ns','os','any')){
-
+median_uncertainUCDP <- function(fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
 	puncertainUCDP(0.5, fatalities, tov)
@@ -265,27 +258,21 @@ median_uncertainUCDP <- function(fatalities, tov = c('sb','ns','os','any')){
 
 #' @rdname mean_uncertainUCDP
 #' @export
-quantiles_unceartainUCDP <- function(probs, fatalities, tov = c('sb','ns','os','any')){
-
+quantiles_unceartainUCDP <- function(
+	probs,
+	fatalities,
+	tov = c('sb', 'ns', 'os', 'any')
+) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
 	return(quncertainUCDP(probs, fatalities, tov))
 }
 
 
-rgumbel <- function (n, loc, scale){
+rgumbel <- function(n, loc, scale) {
 	if (any(scale <= 0)) {
 		warning("NaNs produced")
 		return(rep.int(NaN, n))
 	}
 	loc - scale * log(-log(stats::runif(n)))
 }
-
-
-
-
-
-
-
-
-
