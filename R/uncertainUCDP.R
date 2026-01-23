@@ -157,7 +157,7 @@ puncertainUCDP <- function(q, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
 	return(
-		(mistr::pgumbel(q, params$loc, params$scale) * (1 - params$w)) +
+		(pgumbel(q, params$loc, params$scale) * (1 - params$w)) +
 			(as.numeric(q >= fatalities) * params$w)
 	)
 }
@@ -169,7 +169,7 @@ duncertainUCDP <- function(x, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	inflate <- as.numeric(x == fatalities)
 
 	return(
-		mistr::dgumbel(x, params$loc, params$scale) *
+		dgumbel(x, params$loc, params$scale) *
 			(1 - params$w) +
 			inflate * params$w
 	)
@@ -180,20 +180,30 @@ duncertainUCDP <- function(x, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 quncertainUCDP <- function(p, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
-	infliction_point <- mistr::pgumbel(fatalities, params$loc, params$scale) *
+	infliction_point <- pgumbel(fatalities, params$loc, params$scale) *
 		(1 - params$w)
 
-	if (p < infliction_point) {
-		return(mistr::qgumbel(p / (1 - params$w), params$loc, params$scale))
-	} else if (p <= params$w + infliction_point) {
-		return(fatalities)
-	} else if (p > params$w + infliction_point) {
-		return(mistr::qgumbel(
-			(p - params$w) / (1 - params$w),
-			params$loc,
-			params$scale
-		))
+	p_less_vec <- p < infliction_point
+	p_less_vec2 <- p <= params$w + infliction_point
+	res <- numeric(length(fatalities))
+	if (any(p_less_vec)) {
+		res[p_less_vec] <- qgumbel(
+			p / (1 - params$w[p_less_vec]),
+			params$loc[p_less_vec],
+			params$scale[p_less_vec]
+		)
 	}
+	if (any(p_less_vec2 & !p_less_vec)) {
+		res[p_less_vec2 & !p_less_vec] <- fatalities[p_less_vec2 & !p_less_vec]
+	}
+	if (any(!p_less_vec2)) {
+		res[!p_less_vec2] <- qgumbel(
+			(p - params$w[!p_less_vec2]) / (1 - params$w[!p_less_vec2]),
+			params$loc[!p_less_vec2],
+			params$scale[!p_less_vec2]
+		)
+	}
+	return(res)
 }
 
 
@@ -233,10 +243,10 @@ quncertainUCDP <- function(p, fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 #' median_uncertainUCDP(ucdpged$best[1], tov = ucdpged$type_of_violence[1])
 #'
 #' # Calculate the 90th percentile for an arbitrary UCDP event
-#' quantiles_unceartainUCDP(probs = 0.9, fatalities = 100, tov = 'sb')
+#' quantile_uncertainUCDP(probs = 0.9, fatalities = 100, tov = 'sb')
 #'
 #' # Calculate the 90th percentile for the first event in the UCDP GED sample
-#' quantiles_unceartainUCDP(ucdpged$best[1], 0.9, tov = ucdpged$type_of_violence[1])
+#' quantile_uncertainUCDP(ucdpged$best[1], 0.9, tov = ucdpged$type_of_violence[1])
 #'
 mean_uncertainUCDP <- function(fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
@@ -253,12 +263,12 @@ mean_uncertainUCDP <- function(fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 median_uncertainUCDP <- function(fatalities, tov = c('sb', 'ns', 'os', 'any')) {
 	params <- uncertainUCDP_parameters(fatalities, tov)
 
-	puncertainUCDP(0.5, fatalities, tov)
+	quncertainUCDP(0.5, fatalities, tov)
 }
 
 #' @rdname mean_uncertainUCDP
 #' @export
-quantiles_unceartainUCDP <- function(
+quantile_uncertainUCDP <- function(
 	probs,
 	fatalities,
 	tov = c('sb', 'ns', 'os', 'any')
@@ -275,4 +285,67 @@ rgumbel <- function(n, loc, scale) {
 		return(rep.int(NaN, n))
 	}
 	loc - scale * log(-log(stats::runif(n)))
+}
+
+pgumbel <- function(q, loc, scale, lower.tail = TRUE, log.p = FALSE) {
+	if (any(scale <= 0)) {
+		warning("NaNs produced")
+		return(rep.int(NaN, length(q)))
+	}
+	Z <- numeric(length(q))
+	nat <- is.na(q)
+	Z[nat] <- q[nat]
+	q <- q[!nat]
+	z <- exp(-exp(-(q - loc) / scale))
+	Z[!nat] <- z
+	if (!lower.tail) {
+		Z <- 1 - Z
+	}
+	if (log.p) {
+		log(Z)
+	} else {
+		Z
+	}
+}
+
+dgumbel <- function(x, loc, scale, log = FALSE) {
+	if (any(scale <= 0)) {
+		warning("NaNs produced")
+		return(rep.int(NaN, length(x)))
+	}
+	Z <- numeric(length(x))
+	nat <- is.na(x)
+	Z[nat] <- x[nat]
+	x <- x[!nat]
+	z <- exp(-((x - loc) / scale + exp(-(x - loc) / scale))) / scale
+	Z[!nat] <- z
+	if (log) {
+		log(Z)
+	} else {
+		Z
+	}
+}
+
+qgumbel <- function(p, loc, scale, lower.tail = TRUE, log.p = FALSE) {
+	if (any(scale <= 0)) {
+		warning("NaNs produced")
+		return(rep.int(NaN, length(p)))
+	}
+	Z <- numeric(length(p))
+	nat <- is.na(p)
+	Z[nat] <- p[nat]
+	p <- p[!nat]
+	z <- numeric(length(p))
+	if (log.p) {
+		p <- exp(p)
+	}
+	if (!lower.tail) {
+		p <- 1 - p
+	}
+	ok <- p >= 0 & p <= 1
+	p <- p[ok]
+	z[ok] <- loc - scale * log(-log(p))
+	z[!ok] <- NaN
+	Z[!nat] <- z
+	Z
 }

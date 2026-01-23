@@ -3,14 +3,14 @@
 \name{mean_uncertainUCDP}
 \alias{mean_uncertainUCDP}
 \alias{median_uncertainUCDP}
-\alias{quantiles_unceartainUCDP}
+\alias{quantile_uncertainUCDP}
 \title{Mean, median, and quantiles of the parametric uncertainty distributions for UCDP events}
 \usage{
 mean_uncertainUCDP(fatalities, tov = c("sb", "ns", "os", "any"))
 
 median_uncertainUCDP(fatalities, tov = c("sb", "ns", "os", "any"))
 
-quantiles_unceartainUCDP(probs, fatalities, tov = c("sb", "ns", "os", "any"))
+quantile_uncertainUCDP(probs, fatalities, tov = c("sb", "ns", "os", "any"))
 }
 \arguments{
 \item{fatalities}{A vector of non-negative integers representing the number of fatalities of the UCDP events. Non-integer values are allowed but should be considered experimental.}
@@ -47,9 +47,9 @@ median_uncertainUCDP(fatalities = 100, tov = 'sb')
 median_uncertainUCDP(ucdpged$best[1], tov = ucdpged$type_of_violence[1])
 
 # Calculate the 90th percentile for an arbitrary UCDP event
-quantiles_unceartainUCDP(probs = 0.9, fatalities = 100, tov = 'sb')
+quantile_uncertainUCDP(probs = 0.9, fatalities = 100, tov = 'sb')
 
 # Calculate the 90th percentile for the first event in the UCDP GED sample
-quantiles_unceartainUCDP(ucdpged$best[1], 0.9, tov = ucdpged$type_of_violence[1])
+quantile_uncertainUCDP(ucdpged$best[1], 0.9, tov = ucdpged$type_of_violence[1])
 
 }
